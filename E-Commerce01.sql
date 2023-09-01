@@ -1,4 +1,5 @@
 -- Criando o Banco de Dados para o cenário de E-Commerce ----------------
+-- drop database ecommerce;
 create database ecommerce;
 use ecommerce;
 -- Criando as Tabelas ----------------
@@ -14,6 +15,15 @@ create table clients(
     constraint unique_cpf_client unique (CPF) -- define que o numero de cpf deve ser unico para cada registro 
 );
 desc clients;
+-- alter table clients auto_increment=1;
+insert into clients (Fname,Minit,Lname,CPF,Address) values(
+	'Maria','M','Silva',12345678901,'rua silva de prata 29'),
+    ('Matheus','O','Pimentel',987654321,'rua alameda 289'),
+    ('Ricardo','F','Silva',45678913,'avenida alameda vinha 1009'),
+    ('Julia','S','França',789123456,'rua laranjeiras 861'),
+    ('Roberta','G','Assis',98745631,'avenida koller'),
+    ('Isabela','M','Cruz',654789123,'rua alameda das flores'
+);
 
 -- Produtos
 create table product(
@@ -24,16 +34,26 @@ create table product(
     Avaliation float default 0,
     Size varchar(10) -- size equivale a dimenssão do produto
 );
+-- alter table product auto_increment=1;
+insert into product (Pnome,Classification_kids,Category,Avaliation,Size) values(
+	'Fone',false,'Eletrônicos','4',null),
+	('Barbie',true,'Brinquedos','3',null),
+    ('Body',true,'Vestimentas','5',null),
+    ('Microfone',false,'Eletrônicos','4',null),
+    ('Sofá',false,'Móveis','3','3x57x80'),
+    ('Farinha',false,'Alimentos','2',null),
+    ('Fire Stick',false,'Eletrônicos','3',null
+);
 
 -- Pagamentos
 -- Terminar de implementar e criar a conexão com as tabelas necessárias
 -- Criar constraints relacionadas ao pagamento
 create table payments(
-	IdClient int primary key,
+	IdClient int,
     IdPayment int,
     TypePayment enum('Boleto','Cartão','Dois Cartões'),
     LimitAvailable float,
-    primary key(IdClient, Id_Payment)
+    primary key(IdClient, IdPayment)
 );
 
 -- Pedidos
@@ -46,8 +66,17 @@ create table orders(
     PaymentCash bool default false,
 --  IdPayment...
 	constraint fk_orders_client foreign key (IdOrderClient) references clients(IdClient)
+		on update cascade
+		-- on delete set null
 );
-desc orders;
+-- desc orders;
+-- alter table orders auto_increment=1;
+insert into orders (IdOrderClient,OrderStatus,OrdersDescription,SendValue,PaymentCash) values(
+	1,null,'compra via aplicativo',null,true),
+    (2,null,'compra via aplicativo',50,false),
+    (3,'Confirmado',null,null,true),
+    (4,null,'compra via aplicativo',150,false
+);
 
 -- Estoque
 create table productStorage(
@@ -55,6 +84,7 @@ create table productStorage(
     StorageLocation varchar(255),
     Quantity int default 0
 );
+-- alter table productStorage auto_increment=1;
 
 -- Fornecedores
 create table supplier(
@@ -64,7 +94,8 @@ create table supplier(
     Contact char(11) not null,
     constraint unique_supplier unique (CNPJ)
 );
-desc supplier;
+-- desc supplier;
+-- alter table supplier auto_increment=1;
 
 -- Vendedores
 create table sellers(
@@ -78,6 +109,7 @@ create table sellers(
     constraint unique_cnpj_supplier unique (CNPJ),
     constraint unique_cpf_supplier unique (CPF)
 );
+-- alter table sellers auto_increment=1;
 
 create table productSeller(
 	IdPSeller int,
@@ -87,7 +119,7 @@ create table productSeller(
     constraint fk_product_seller foreign key (IdPSeller) references sellers(IdSeller),
 	constraint fk_product_product foreign key (IdPProduct) references product(IdProduct)
 );
-desc productSeller;
+-- desc productSeller;
 
 create table productOrder(
 	IdPOProduct int,
@@ -108,5 +140,9 @@ create table storageLocation(
 	constraint fk_storage_location_storage foreign key (IdLStorage) references productStorage(IdProdStorage)
 );
 
-show tables;
+-- show tables;
 
+use information_schema;
+-- show tables;
+-- desc referential_constraints;
+select * from referential_constraints where constraint_schema = 'ecommerce';
